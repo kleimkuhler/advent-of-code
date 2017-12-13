@@ -1,15 +1,20 @@
 import re
 
-def compute(firewall):
-    severity = 0
-    for layer, height in firewall.items():
-        if layer % ((height - 1) * 2) == 0:
-            severity += layer * height
-    return severity
+caught = lambda layer, height: layer % ((height - 1) * 2) == 0
 
-with open('./input_test.txt') as f:
+def compute(firewall):
+    return sum(l*h for l, h in firewall.items() if caught(l, h))
+
+def wait(firewall):
+    delay = 0
+    while (any(caught(l+delay, h) for l, h in firewall.items())):
+        delay += 1
+    return delay
+
+with open('./input.txt') as f:
     firewall = {}
     for line in f:
         layer, height = re.findall(r'\d+', line)
         firewall[int(layer)] = int(height)
     print('1: {}'.format(compute(firewall)))
+    print('2: {}'.format(wait(firewall)))
