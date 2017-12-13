@@ -6,8 +6,7 @@ def find_roots(dag):
     visited = []
     for node, props in dag.items():
         visited.extend(props['children'])
-    roots = set(dag.keys()) ^ set(visited)
-    return roots
+    return set(dag.keys()) ^ set(visited)
 
 def make_dag(nodes):
     dag = {}
@@ -55,9 +54,14 @@ def find_weight(dag, root, total_weights):
     child_weight = reduce(lambda x, y : x + y, child_weights)
     return dag[root]['weight'] + child_weight
 
-def find_bad_weight(root_weights):
-    weights = dict(Counter(root_weights).most_common())
-    return list(weights.keys()).pop()
+def find_bad_node(dag, children_weights, total_weights):
+    weight_counter = dict(Counter(children_weights).most_common())
+    weight_keys = list(weight_counter.keys())
+
+    # compute delta & bad_weight -> use results to find bad_node
+    delta = weight_keys[0] - weight_keys[1]
+    bad_node = list(total_weights.keys())[list(total_weights.values()).index(weight_keys[1])]
+    return dag[bad_node]['weight'] + delta
 
 def a(dag):
     roots = find_roots(dag)
@@ -82,13 +86,9 @@ def b(dag):
                 total_weights[child] = find_weight(dag, child, total_weights)
                 children_weights.append(total_weights[child])
 
-            unique_weights = set(children_weights)
-            if len(unique_weights) != 1:
-                # find bad_weight and lookup unbalanced root weight
-                delta = unique_weights.pop() - unique_weights.pop()
-                bad_weight = find_bad_weight(children_weights)
-                bad_node = list(total_weights.keys())[list(total_weights.values()).index(bad_weight)]
-                return dag[bad_node]['weight'] - delta
+            # found bad node
+            if len(set(children_weights)) != 1:
+                return find_bad_node(dag, children_weights, total_weights)
 
 with open("./input.txt") as f:
     dag = {}
