@@ -1,15 +1,13 @@
 import re
 
-caught = lambda layer, height: layer % ((height - 1) * 2) == 0
+from itertools import count
 
-def compute(firewall):
-    return sum(l*h for l, h in firewall.items() if caught(l, h))
-
-def wait(firewall):
-    delay = 0
-    while (any(caught(l+delay, h) for l, h in firewall.items())):
-        delay += 1
-    return delay
+caught  = lambda layer, height: layer % ((height - 1) * 2) == 0
+compute = lambda firewall: \
+          sum(l*h for l, h in firewall.items() if caught(l, h))
+wait    = lambda firewall: \
+          next(delay for delay in count() \
+               if not any(caught(l+delay, h) for l, h in firewall.items()))
 
 with open('./input.txt') as f:
     firewall = {}
