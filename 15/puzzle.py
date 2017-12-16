@@ -1,8 +1,6 @@
-r1, r2, afac, bfac = 40000000, 5000000, 16807, 48271
-
-agen = lambda seed: generator(seed, afac)
-bgen = lambda seed: generator(seed, bfac)
 last_int = lambda line: int([x for x in line.strip().split()].pop())
+agen = lambda seed: generator(seed, 16807)
+bgen = lambda seed: generator(seed, 48271)
 
 def generator(prev, factor, mod=2147483647):
     while True:
@@ -11,15 +9,13 @@ def generator(prev, factor, mod=2147483647):
 
 def duel(agen, bgen, repeat=5, bits=16):
     match = 2**bits
-    count = 0
-    for _ in range(repeat):
-        if next(agen) % match == next(bgen) % match:
-            count += 1
-    return count
+    return sum(next(agen) % match == next(bgen) % match
+               for _ in range(repeat))
 
 with open('./input.txt') as f:
     aseed = last_int(f.readline())
     bseed = last_int(f.readline())
+    r1, r2 = 40000000, 5000000
 
     print('1: {}'.format(duel(agen(aseed), bgen(bseed), r1)))
     print('2: {}'.format(duel(filter(lambda x: x % 4 == 0, agen(aseed)),
