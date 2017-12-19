@@ -1,20 +1,21 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 
-def run(instructions):
+def run(il):
+    "Part 1: Run an instruction list and return the first succesful `rcv`."
     registers, frequencies = defaultdict(int), defaultdict(int)
-    i = 0
     def value(x):
         try: return int(x)
         except ValueError: return registers[x]
-    while i >= 0 and i < len(instructions):
-        instr, *arg = instructions[i].split()
+    i = 0
+    while i >= 0 and i < len(il):
+        instr, *arg = il[i].split()
         if   instr == 'add': registers[arg[0]]  += value(arg[1])
         elif instr == 'snd': frequencies[arg[0]] = registers[arg[0]]
         elif instr == 'set': registers[arg[0]]   = value(arg[1])
         elif instr == 'mul': registers[arg[0]]  *= value(arg[1])
         elif instr == 'mod': registers[arg[0]]  %= value(arg[1])
         elif instr == 'jgz':
-            if registers[arg[0]] > 0:
+            if value(arg[0]) > 0:
                 i += value(arg[1]) - 1
         elif instr == 'rcv':
             if frequencies[arg[0]]:
@@ -22,5 +23,5 @@ def run(instructions):
         i += 1
 
 with open('./input.txt') as f:
-    instructions = [x.strip() for x in f.readlines()]
-    print('1: {}'.format(run(instructions)))
+    il = [x.strip() for x in f.readlines()]
+    print('1: {}'.format(run(il)))
