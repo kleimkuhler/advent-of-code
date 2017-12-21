@@ -1,7 +1,6 @@
 import re
 
 from collections import defaultdict
-from math import sqrt
 
 def group(A, n):
     "Make m groups of size n."
@@ -10,7 +9,7 @@ def group(A, n):
 def magnitude(vec):
     "Return the magnitude of a 3 dimensional vector."
     x, y, z = vec
-    return sqrt(abs(x) + abs(y) + abs(z))
+    return abs(x) + abs(y) + abs(z)
 
 def minimum_reduce(D, comp, constraint):
     """Reduce the {key: value} pairs of a dict down to the minimum `comp()`
@@ -45,18 +44,6 @@ def ticker(pos, vel, accel):
                     accel.pop(p)
         yield (pos, vel, accel)
 
-def uncatchable(pos, vel, accel):
-    """Return true if the sorted list of keys for the position, velocity,
-    and acceleration magnitudes are equal, meaning they are in an
-    unchangeable state"""
-    magpos = {k: magnitude(v) for k, v in pos.items()}
-    magvel = {k: magnitude(v) for k, v in vel.items()}
-    magaccel = {k: magnitude(v) for k, v in accel.items()}
-    sortpos = [k for k in sorted(magpos, key=magpos.get)]
-    sortvel = [k for k in sorted(magvel, key=magvel.get)]
-    sortaccel = [k for k in sorted(magaccel, key=magaccel.get)]
-    return sortpos == sortvel
-            
 def collide(pos, vel, accel):
     "Tick particle states until system is in an uncatchable state."
     T = ticker(pos, vel, accel)
